@@ -22,11 +22,11 @@ jobs:
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release
 
-      - name: smile.txt
+      - name: Test with smile.txt
         run: |
           build/Release/physics.exe data/smile.txt
 
-      - name: elephant.txt
+      - name: Test with elephant.txt
         run: |
           build/Release/physics.exe data/elephant.txt
 
@@ -47,15 +47,7 @@ jobs:
           cmake -B build
           cmake --build build
 
-      - name: smile.txt
-        run: |
-          build/physics data/smile.txt
-
-      - name: elephant.txt
-        run: |
-          build/physics data/elephant.txt
-
-      - name: Upload macOS executable
+      - name: Upload macOS executable (skip tests due to OpenGL requirements)
         uses: actions/upload-artifact@v4
         with:
           name: macos-executable
@@ -81,13 +73,15 @@ jobs:
 
       - name: Prepare release files
         run: |
-
+          # Windows files
           cp dist/windows/physics.exe dist/windows/physics-smile-windows.exe
           cp dist/windows/physics.exe dist/windows/physics-elephant-windows.exe
           
+          # macOS files
           cp dist/macos/physics dist/macos/physics-smile-macos
           cp dist/macos/physics dist/macos/physics-elephant-macos
-
+          
+          # Make macOS files executable
           chmod +x dist/macos/physics-smile-macos
           chmod +x dist/macos/physics-elephant-macos
 
