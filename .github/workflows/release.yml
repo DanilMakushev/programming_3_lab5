@@ -27,15 +27,15 @@ jobs:
           # Папка для Windows
           mkdir windows-package
           cp build/Release/physics.exe windows-package/
-          cp data/smile.txt windows-package/
-          cp data/elephant.txt windows-package/
+          cp data/smile.txt windows-package/smile-windows.txt
+          cp data/elephant.txt windows-package/elephant-windows.txt
           
           # Создаем batch-файлы
           echo "@echo off" > windows-package/physics-smile-windows.bat
-          echo "physics.exe smile.txt" >> windows-package/physics-smile-windows.bat
+          echo "physics.exe smile-windows.txt" >> windows-package/physics-smile-windows.bat
           
           echo "@echo off" > windows-package/physics-elephant-windows.bat
-          echo "physics.exe elephant.txt" >> windows-package/physics-elephant-windows.bat
+          echo "physics.exe elephant-windows.txt" >> windows-package/physics-elephant-windows.bat
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -56,20 +56,23 @@ jobs:
 
       - name: Create macOS package
         run: |
-          # Создаем папку для macOS релиза
+          # Папка для macOS
           mkdir macos-package
           cp build/physics macos-package/
-          cp data/smile.txt macos-package/
-          cp data/elephant.txt macos-package/
+          cp data/smile.txt macos-package/smile-macos.txt
+          cp data/elephant.txt macos-package/elephant-macos.txt
           
           # Создаем shell-скрипты
           echo "#!/bin/bash" > macos-package/physics-smile-macos.sh
-          echo "./physics smile.txt" >> macos-package/physics-smile-macos.sh
+          echo "./physics smile-macos.txt" >> macos-package/physics-smile-macos.sh
           
           echo "#!/bin/bash" > macos-package/physics-elephant-macos.sh
-          echo "./physics elephant.txt" >> macos-package/physics-elephant-macos.sh
+          echo "./physics elephant-macos.txt" >> macos-package/physics-elephant-macos.sh
           
-          chmod +x macos-package/physics-smile-macos.sh macos-package/physics-elephant-macos.sh macos-package/physics
+          # Делаем файлы исполняемыми
+          chmod +x macos-package/physics-smile-macos.sh 
+          chmod +x macos-package/physics-elephant-macos.sh 
+          chmod +x macos-package/physics
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
@@ -104,13 +107,13 @@ jobs:
           prerelease: false
           files: |
             dist/windows/physics.exe
-            dist/windows/smile.txt
-            dist/windows/elephant.txt
+            dist/windows/smile-windows.txt
+            dist/windows/elephant-windows.txt
             dist/windows/physics-smile-windows.bat
             dist/windows/physics-elephant-windows.bat
             dist/macos/physics
-            dist/macos/smile.txt
-            dist/macos/elephant.txt
+            dist/macos/smile-macos.txt
+            dist/macos/elephant-macos.txt
             dist/macos/physics-smile-macos.sh
             dist/macos/physics-elephant-macos.sh
         env:
