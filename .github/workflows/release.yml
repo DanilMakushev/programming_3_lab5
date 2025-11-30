@@ -1,0 +1,107 @@
+name: 'lab5'
+
+on:
+  push:
+    branches:
+      - main
+      - feature/github_actions
+
+env:
+  Version_Project: "0.1"
+  Version_Release: "0.1"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build project
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+
+      - name: smile.txt
+        run: |
+          build/Release/physics.exe data/smile.txt
+
+      - name: elephant.txt
+        run: |
+          build/Release/physics.exe data/elephant.txt
+
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-executable
+          path: build/Release/physics.exe
+
+  build-macos:
+    runs-on: macos-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build project
+        run: |
+          cmake -B build
+          cmake --build build
+
+      - name: smile.txt
+        run: |
+          build/physics data/smile.txt
+
+      - name: elephant.txt
+        run: |
+          build/physics data/elephant.txt
+
+      - name: Upload macOS executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-executable
+          path: build/physics
+
+  create-release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-executable
+          path: dist/windows
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-executable
+          path: dist/macos
+
+      - name: Prepare release files
+        run: |
+
+          cp dist/windows/physics.exe dist/windows/physics-smile-windows.exe
+          cp dist/windows/physics.exe dist/windows/physics-elephant-windows.exe
+          
+          cp dist/macos/physics dist/macos/physics-smile-macos
+          cp dist/macos/physics dist/macos/physics-elephant-macos
+
+          chmod +x dist/macos/physics-smile-macos
+          chmod +x dist/macos/physics-elephant-macos
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.Version_Release }}
+          name: Release ${{ env.Version_Release }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/windows/physics-smile-windows.exe
+            dist/windows/physics-elephant-windows.exe
+            dist/macos/physics-smile-macos
+            dist/macos/physics-elephant-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
