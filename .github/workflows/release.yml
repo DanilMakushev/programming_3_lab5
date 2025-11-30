@@ -90,19 +90,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: physics-windows
-          path: release/
+          path: physics-windows
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
           name: physics-macos
-          path: release/
+          path: physics-macos
 
       - name: Create zip archives
         run: |
           # Создаем zip-архивы для каждой платформы
-          cd release/physics-windows && zip -r ../physics-windows.zip . && cd ../..
-          cd release/physics-macos && zip -r ../physics-macos.zip . && cd ../..
+          zip -r physics-windows.zip physics-windows/
+          zip -r physics-macos.zip physics-macos/
 
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
@@ -112,7 +112,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            release/physics-windows.zip
-            release/physics-macos.zip
+            physics-windows.zip
+            physics-macos.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
