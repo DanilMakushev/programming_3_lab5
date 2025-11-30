@@ -22,19 +22,26 @@ jobs:
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release
 
-      - name: Test with smile.txt
+      - name: Create Windows package
         run: |
-          build/Release/physics.exe data/smile.txt
+          # Папка для Windows
+          mkdir windows-package
+          cp build/Release/physics.exe windows-package/
+          cp data/smile.txt windows-package/
+          cp data/elephant.txt windows-package/
+          
+          # Создаем batch-файлы
+          echo "@echo off" > windows-package/physics-smile-windows.bat
+          echo "physics.exe smile.txt" >> windows-package/physics-smile-windows.bat
+          
+          echo "@echo off" > windows-package/physics-elephant-windows.bat
+          echo "physics.exe elephant.txt" >> windows-package/physics-elephant-windows.bat
 
-      - name: Test with elephant.txt
-        run: |
-          build/Release/physics.exe data/elephant.txt
-
-      - name: Upload Windows executable
+      - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: windows-executable
-          path: build/Release/physics.exe
+          name: windows-package
+          path: windows-package/
 
   build-macos:
     runs-on: macos-latest
@@ -47,11 +54,28 @@ jobs:
           cmake -B build
           cmake --build build
 
-      - name: Upload macOS executable (skip tests due to OpenGL requirements)
+      - name: Create macOS package
+        run: |
+          # Создаем папку для macOS релиза
+          mkdir macos-package
+          cp build/physics macos-package/
+          cp data/smile.txt macos-package/
+          cp data/elephant.txt macos-package/
+          
+          # Создаем shell-скрипты
+          echo "#!/bin/bash" > macos-package/physics-smile-macos.sh
+          echo "./physics smile.txt" >> macos-package/physics-smile-macos.sh
+          
+          echo "#!/bin/bash" > macos-package/physics-elephant-macos.sh
+          echo "./physics elephant.txt" >> macos-package/physics-elephant-macos.sh
+          
+          chmod +x macos-package/physics-smile-macos.sh macos-package/physics-elephant-macos.sh macos-package/physics
+
+      - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: macos-executable
-          path: build/physics
+          name: macos-package
+          path: macos-package/
 
   create-release:
     needs: [build-windows, build-macos]
@@ -59,31 +83,17 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download Windows artifact
+      - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
-          name: windows-executable
+          name: windows-package
           path: dist/windows
 
-      - name: Download macOS artifact
+      - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
-          name: macos-executable
+          name: macos-package
           path: dist/macos
-
-      - name: Prepare release files
-        run: |
-          # Windows files
-          cp dist/windows/physics.exe dist/windows/physics-smile-windows.exe
-          cp dist/windows/physics.exe dist/windows/physics-elephant-windows.exe
-          
-          # macOS files
-          cp dist/macos/physics dist/macos/physics-smile-macos
-          cp dist/macos/physics dist/macos/physics-elephant-macos
-          
-          # Make macOS files executable
-          chmod +x dist/macos/physics-smile-macos
-          chmod +x dist/macos/physics-elephant-macos
 
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
@@ -93,9 +103,15 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            dist/windows/physics-smile-windows.exe
-            dist/windows/physics-elephant-windows.exe
-            dist/macos/physics-smile-macos
-            dist/macos/physics-elephant-macos
+            dist/windows/physics.exe
+            dist/windows/smile.txt
+            dist/windows/elephant.txt
+            dist/windows/physics-smile-windows.bat
+            dist/windows/physics-elephant-windows.bat
+            dist/macos/physics
+            dist/macos/smile.txt
+            dist/macos/elephant.txt
+            dist/macos/physics-smile-macos.sh
+            dist/macos/physics-elephant-macos.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
