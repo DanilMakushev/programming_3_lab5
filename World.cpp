@@ -16,8 +16,8 @@ World::World(const std::string& worldFilePath) {
 
     std::ifstream stream(worldFilePath);
 
-    topLeft = readPoint(stream);
-    bottomRight = readPoint(stream);
+    stream >> topLeft;
+    stream >> bottomRight;
     physics.setWorldBox(topLeft, bottomRight);
 
     // Здесь не хватает обработки ошибок, но на текущем

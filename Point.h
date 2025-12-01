@@ -11,12 +11,6 @@ class Point {
     double y{};
 };
 
-inline Point readPoint(std::istream& stream) {
-    Point p;
-    stream >> p.x >> p.y;
-    return p;
-}
-
 inline Point operator-(const Point& lhs, const Point& rhs) {
     return {lhs.x - rhs.x, lhs.y - rhs.y};
 }

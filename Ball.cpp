@@ -23,7 +23,7 @@ bool Ball::getIsCollidable(){
 /**
  * Задает скорость объекта
  * @param velocity новое значение скорости
- */
+ */ 
 void Ball::setVelocity(const Velocity& velocity) {
     this->velocity = velocity;
 }
