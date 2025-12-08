@@ -16,8 +16,8 @@ void Physics::update(std::vector<Ball>& balls, const size_t ticks, std::vector<D
     for (size_t i = 0; i < ticks; ++i) {
         move(balls);
         move(dusts);
-        collideWithBox(balls);
-        collideWithBox(dusts);
+        collideBallsWithBox(balls);
+        collideDustsWithBox(dusts);
         collideBalls(balls, dusts);
     }
 }
@@ -44,7 +44,7 @@ void Physics::collideBalls(std::vector<Ball>& balls, std::vector<Dust>& dusts) c
 }
 
 
-void Physics::collideWithBox(std::vector<Dust>& dusts) const {
+void Physics::collideDustsWithBox(std::vector<Dust>& dusts) const {
     for (Dust& dust : dusts) {
         const Point p = dust.getCenter();
         const double r = dust.getRadius();
@@ -83,7 +83,7 @@ void Physics::collideWithBox(std::vector<Dust>& dusts) const {
 }
 
 
-void Physics::collideWithBox(std::vector<Ball>& balls) const {
+void Physics::collideBallsWithBox(std::vector<Ball>& balls) const {
     for (Ball& ball : balls) {
         const Point p = ball.getCenter();
         const double r = ball.getRadius();

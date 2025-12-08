@@ -8,6 +8,7 @@ Dust::Dust(){
 }
 
 
+// Получаем значение скорости и расположение шара
 void Dust::processDust(Ball& ball){
     this->point = ball.getCenter();
     this->velocity = ball.getVelocity();
