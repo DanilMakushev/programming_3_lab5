@@ -15,7 +15,8 @@ public:
     double getRadius() const;
     double getMass() const;
     void draw(Painter& painter) const;
-private:
+    
+protected:
     Color color;
     Point point;
     Velocity velocity;
